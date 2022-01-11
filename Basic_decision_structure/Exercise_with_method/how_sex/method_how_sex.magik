@@ -1,0 +1,24 @@
+## Method that receives a char(M or F) and indicates the gender
+## The char16_vector class is for receiving char
+_method char16_vector.method_how_sex()
+# decision structure IF in Magik
+_if _self = "F" 
+ 
+    _then
+        #Char received is equal to F
+        write(_self + " - Female")
+        #write a string
+        _return
+    _elif _self = "M" 
+    _then 
+        #Char received is equal to M
+        write(_self + " - Male")
+        #write a string
+    _return
+    _else 
+        #Char was not found
+        write(" Sex not found !")
+        #write a string
+    _return
+_endif
+_endmethod
