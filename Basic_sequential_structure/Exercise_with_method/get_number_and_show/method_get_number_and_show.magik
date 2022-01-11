@@ -1,0 +1,9 @@
+## Method to write a string with a integer number
+## The integer class is for receiving integer numbers
+_method integer.get_number_and_show()
+## method "write_string" write a interge in string
+message << "This value is " + _self.write_string
+## In magik it is not possible to use operations with variables of different types.
+show(message)
+_return 
+_endmethod
