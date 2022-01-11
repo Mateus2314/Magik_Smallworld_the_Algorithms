@@ -12,6 +12,7 @@
   <h3>Make a procedure that displays the message "Hello world" in Emacs</h3>
 </div>
 ## How to use
+
 Declare the proc in Emacs and call it by the variable 'return_v' in a second command
 
 ```magik

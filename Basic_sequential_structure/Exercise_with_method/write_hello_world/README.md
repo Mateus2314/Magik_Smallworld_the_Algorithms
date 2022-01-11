@@ -12,7 +12,15 @@
   <h3>Make a method that displays the message "Hello world" in Emacs</h3>
 </div>
 
+## How to use
 
+Declare the method in Emacs and call it by .method_Hello() in a second command
+
+```magik
+ (user)MagikSF> a << 'string'
+ (user)MagikSf> a.method_Hello()
+"Hello World Magik Dev's!"
+ ```
 
 <!-- ## Getting Started
 
