@@ -1,0 +1,9 @@
+## Method to write Hello World 
+## The char16_vector class is for receiving strings
+_method char16_vector.method_Hello()
+
+message << " Hello World Magik Dev's!"
+   ##write function writes the message array to Emac 
+    write(message)
+    _return 
+_endmethod
