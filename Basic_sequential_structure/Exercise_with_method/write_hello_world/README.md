@@ -21,7 +21,7 @@ Declare the method in Emacs and call it by .method_Hello() in a second command
  (user)MagikSf> a.method_Hello()
 "Hello World Magik Dev's!"
  ```
-
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/write_hello_world/picture/hello_world_picture.png)
 <!-- ## Getting Started
 
 Open Source resource for learning object-oriented programming language with Magik on SmallWorld. #Magik_Smallworld_the_Algorithms
