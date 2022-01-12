@@ -23,6 +23,8 @@ Declare the method in Emacs and call it by .method_sum in a second command
 "The sum is 30"
  ```
 
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+
 <!-- ## Getting Started
 
 Open Source resource for learning object-oriented programming language with Magik on SmallWorld. #Magik_Smallworld_the_Algorithms
