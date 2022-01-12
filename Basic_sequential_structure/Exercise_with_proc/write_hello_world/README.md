@@ -16,10 +16,12 @@
 Declare the proc in Emacs and call it by the variable 'return_v' in a second command
 
 ```magik
- (user)MagikSF> return_v
+ (user)MagikSF> return_v()
 $
 "Hello World Magik Dev's!"
  ```
+
+ ![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_proc/write_hello_world/picture/hello_world_picture.png)
 <!-- 
 
 Open Source resource for learning object-oriented programming language with Magik on SmallWorld. #Magik_Smallworld_the_Algorithms
