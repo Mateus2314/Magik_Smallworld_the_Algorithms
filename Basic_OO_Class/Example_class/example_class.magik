@@ -1,0 +1,44 @@
+## Example of class declaration
+## Creating class cars
+_pragma(classify_level=basic, topic=cars_example)
+def_slotted_exemplar(:cars_example ,
+# Class slot declaration
+    {
+        # The name, manufacturer and manufacturer_date slots are initialized to _unset
+       {:name, _unset, :readable},
+       {:manufacturer, _unset, :readable},
+       {:manufacturer_date, _unset, :readble},
+       {:km_driven, _unset, :writable }
+       # Only km_driven slot can be changed
+    }               )
+
+    # Method that clones class to generate the object
+    _method cars_example.new(n,mf,md,kd)
+    _return _clone.init ( n, mf, md, kd)
+    _endmethod
+    # Method that inserts the values into the object
+    _private _method cars_example.init(n, mf, md, kd)
+        .name << n
+        .manufacturer << mf
+        .manufacturer_date << md
+        .km_driven << kd
+        _return _self
+    _endmethod
+
+    _method cars_example.age()
+        ## Returns the receiver?s age today, using
+        ## date.now() to obtain today?s date
+        today << date.now()
+        result << today.year - .manufacturer_date.year
+        _if today.day_of_year < .manufacturer_date.day_of_year
+        _then
+            _return result-1
+        _else
+            _return result
+        _endif
+    _endmethod
+
+
+
+
+  
