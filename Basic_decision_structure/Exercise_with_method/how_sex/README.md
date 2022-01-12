@@ -4,7 +4,7 @@
   <a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms">
     <img src="https://siamz.gallerycdn.vsassets.io/extensions/siamz/smallworld-magik/1.5.2/1573561363325/Microsoft.VisualStudio.Services.Icons.Default" height="100">
   </a>
-  <h1><a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithmshttps://github.com/TheAlgorithms/">The Algorithms</a> - Magik</h1>
+  <h1><a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms">The Algorithms</a> - Magik</h1>
 
   
   

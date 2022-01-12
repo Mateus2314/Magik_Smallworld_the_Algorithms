@@ -4,7 +4,7 @@
   <a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms">
     <img src="https://siamz.gallerycdn.vsassets.io/extensions/siamz/smallworld-magik/1.5.2/1573561363325/Microsoft.VisualStudio.Services.Icons.Default" height="100">
   </a>
-  <h1><a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithmshttps://github.com/TheAlgorithms/">The Algorithms</a> - Magik</h1>
+  <h1><a href="https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms">The Algorithms</a> - Magik</h1>
 <!-- Labels: -->
   <!-- First row: -->
   <a href="https://www.linkedin.com/in/mateus-cezar-a43665a5/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="20" target="_blank"></a> 
