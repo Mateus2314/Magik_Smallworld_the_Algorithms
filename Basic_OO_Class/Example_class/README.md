@@ -9,8 +9,8 @@
   
   
 <!-- Short description: -->
-  <h3>Make a Example class declaration in Emacs:</h3>
-  <h4>Class for cars that have slots for name, manufacturer, date of manufacture, and mileage attributes. 
+  <h3>Example of class declaration in Emacs:</h3>
+  <h4>Class for cars that has slots: name, manufacturer, date of manufacturing, and mileage. 
   Of those slots only the mileage will be writable.
   The class has methods that create a clone of the class, which creates the object and tells the age of the car. </h4>
 </div>

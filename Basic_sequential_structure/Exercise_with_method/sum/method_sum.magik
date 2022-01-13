@@ -1,9 +1,9 @@
-## Method to write sum of two integer numbers
-## The integer class is for receiving numbers
+## Method to write the sum of two integer numbers
+## The integer class receives integer numbers
 _method integer.method_sum(n2)
-## The method as_integer() write variable receiving in numbers
+## The method as_integer() converts string to integer
 sum << _self.as_integer() + n2
-## The method write_string write a interge number 'sum' in string  
+## The method write_string converts integer to string 
 sum_string << sum.write_string
 
 write( "The sum is " + sum_string )

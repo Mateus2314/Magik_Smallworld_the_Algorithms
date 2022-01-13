@@ -19,7 +19,7 @@ Declare the method in Emacs and call it by .method_is_vowel() in a second comman
 ```magik
  (user)MagikSF> a << 'F'
  (user)MagikSF> a.method_is_vowel()
-"It's not a vogal!"
+"It's not a vowel!"
  ```
 
 <!-- ## Getting Started

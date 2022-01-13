@@ -1,7 +1,7 @@
 ## Procedure to write Hello World 
 ## The Procedure name is proc_hello_world  
 return_v << _proc @proc_hello_world()
-message << "Hello World Magik Dev's!"
+message << "Hello Magik Dev's World!"
 ##write function writes the message array to Emac 
 write(message)
 _endproc

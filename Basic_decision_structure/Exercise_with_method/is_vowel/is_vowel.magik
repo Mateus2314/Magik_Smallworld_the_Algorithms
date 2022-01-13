@@ -1,16 +1,16 @@
 ## The method receives a char and returns if it is a vowel
-## The char16_vector class is for receiving char
+## The char16_vector class receives char
 _method char16_vector.method_is_vowel()
-# decision structure IF in Magik
+# IF structure in Magik
 
 _if _self = "a" _or _self = "e" _or _self = "i" _or _self = "o" _or _self = "u"
     _then
         ##Char received is equal to {a,e,i,o,u}
-        write("It's a vogal!")
+        write("It's a vowel!")
         #write a string
     _else
         ##Char received is not equal to {a,e,i,o,u}
-        write("It's not a vogal!")
+        write("It's not a vowel!")
         #write a string
 _endif
 _endmethod

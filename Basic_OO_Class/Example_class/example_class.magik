@@ -4,10 +4,10 @@ _pragma(classify_level=basic, topic=cars_example)
 def_slotted_exemplar(:cars_example ,
 # Class slot declaration
     {
-        # The name, manufacturer and manufacturer_date slots are initialized to _unset
+        # The name, manufacturer and manufacturing_date slots are initialized to _unset
        {:name, _unset, :readable},
        {:manufacturer, _unset, :readable},
-       {:manufacturer_date, _unset, :readble},
+       {:manufacturing_date, _unset, :readble},
        {:km_driven, _unset, :writable }
        # Only km_driven slot can be changed
     }               )
@@ -20,17 +20,17 @@ def_slotted_exemplar(:cars_example ,
     _private _method cars_example.init(n, mf, md, kd)
         .name << n
         .manufacturer << mf
-        .manufacturer_date << md
+        .manufacturing_date << md
         .km_driven << kd
         _return _self
     _endmethod
 
     _method cars_example.age()
-        ## Returns the receiver?s age today, using
-        ## date.now() to obtain today?s date
+        ## Returns the car's age using
+        ## date.now() to obtain today's date
         today << date.now()
-        result << today.year - .manufacturer_date.year
-        _if today.day_of_year < .manufacturer_date.day_of_year
+        result << today.year - .manufacturing_date.year
+        _if today.day_of_year < .manufacturing_date.day_of_year
         _then
             _return result-1
         _else

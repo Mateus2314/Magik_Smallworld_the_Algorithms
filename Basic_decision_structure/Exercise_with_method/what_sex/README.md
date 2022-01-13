@@ -14,11 +14,11 @@
 
 ## How to use
 
-Declare the method in Emacs and call it by .method_how_sex() in a second command
+Declare the method in Emacs and call it by .method_what_sex() in a second command
 
 ```magik
  (user)MagikSF> a << 'F'
- (user)MagikSF> a.method_how_sex()
+ (user)MagikSF> a.method_what_sex()
 "F - Female"
  ```
 ![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_decision_structure/Exercise_with_method/how_sex/picture/method_how_sex_picture.png)

@@ -9,7 +9,7 @@
   
   
 <!-- Short description: -->
-  <h3>Make a Method to write sum of two integer numbers in Emacs</h3>
+  <h3>Make a Method to sum two integer numbers in Emacs</h3>
 </div>
 
 ## How to use

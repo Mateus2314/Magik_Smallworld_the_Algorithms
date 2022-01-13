@@ -9,7 +9,7 @@
   
   
 <!-- Short description: -->
-  <h3>This method takes an integer and inserts a string and displays it in Emacs.</h3>
+  <h3>This method takes an integer and displays it as a string in Emacs.</h3>
 </div>
 
 ## How to use
