@@ -1,6 +1,6 @@
 ## Method that receives a char(M or F) and indicates the gender
 ## The char16_vector class receives char 
-_method char16_vector.method_how_sex()
+_method char16_vector.method_what_sex()
 # IF structure in Magik
 _if _self = "F" 
  

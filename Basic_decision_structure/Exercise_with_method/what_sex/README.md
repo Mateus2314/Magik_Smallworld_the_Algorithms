@@ -21,7 +21,7 @@ Declare the method in Emacs and call it by .method_what_sex() in a second comman
  (user)MagikSF> a.method_what_sex()
 "F - Female"
  ```
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_decision_structure/Exercise_with_method/how_sex/picture/method_how_sex_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_decision_structure/Exercise_with_method/how_sex/picture/method_what_sex_picture.png)
 
 <!-- ## Getting Started
 

@@ -21,6 +21,7 @@ Declare the method in Emacs and call it by .method_is_vowel() in a second comman
  (user)MagikSF> a.method_is_vowel()
 "It's not a vowel!"
  ```
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_decision_structure/Exercise_with_method/is_vowel/picture/is_vowel_picture.png)
 
 <!-- ## Getting Started
 
