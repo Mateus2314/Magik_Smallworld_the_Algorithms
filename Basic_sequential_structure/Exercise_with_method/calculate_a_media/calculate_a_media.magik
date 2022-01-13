@@ -1,0 +1,13 @@
+## Method that takes an array with 4 numbers and returns the average of the values
+## The simple_vector class is for receiving array
+_method simple_vector.method_calculate_a_media()
+## Selected element by position within the array
+sum <<  _self[1] + _self[2] + _self[3] + _self[4] 
+## Calculating the average by the size of the array
+average << ( sum / _self.size )
+
+message << " Average is " + average.write_string + "!"
+   ##write function writes the message array to Emac 
+    write(message)
+    _return 
+_endmethod
