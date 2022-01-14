@@ -22,7 +22,7 @@ Declare the method in Emacs and call it by .meter_to_cent() in a second command
 "Is 250.0000000 cm"
  ```
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/meter_to_centimeters/picture/meter_to_cent_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/metro_to_centimeters/picture/meter_to_cent_picture.png)
 
 <!-- ## Getting Started
 
