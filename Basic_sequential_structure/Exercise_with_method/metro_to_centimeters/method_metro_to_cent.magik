@@ -1,0 +1,11 @@
+## Method to convert meters to centimeters
+## The float class receives integer float
+_method float.meter_to_cent()
+
+result << (_self)*100
+## The method write_string converts float to string 
+result_string << result.write_string
+
+write( "Is " + result_string + " cm" )
+    _return 
+_endmethod
