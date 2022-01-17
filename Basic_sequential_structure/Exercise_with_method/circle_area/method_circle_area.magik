@@ -1,0 +1,11 @@
+## Method to circule area calculation with radius in meter
+## The float class receives integer float
+_method float.circle_area()
+
+result << ( 3.14159 * (_self*_self))
+## The method write_string converts float to string 
+result_string << result.write_string
+
+write( "The circle area is " + result_string + " m" )
+    _return 
+_endmethod
