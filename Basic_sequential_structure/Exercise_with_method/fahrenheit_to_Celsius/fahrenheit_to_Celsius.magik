@@ -1,0 +1,11 @@
+## Method to convert one value in Fahrenheit to value in Celsius
+## The float class receives integer float
+_method float.fah_to_cel()
+
+result << 5*((_self -32)/9)
+## The method write_string converts float to string 
+result_string << result.write_string
+
+write( "The result is " + result_string + " ºC" )
+    _return 
+_endmethod
