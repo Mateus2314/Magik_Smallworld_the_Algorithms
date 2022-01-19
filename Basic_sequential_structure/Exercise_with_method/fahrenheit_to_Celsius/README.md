@@ -24,7 +24,7 @@ Declare the method in Emacs and call it by .fah_to_cel() in a second command
 "The circle area is 10.27777778 m"
  ```
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/square_area/picture/square_area_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/fahrenheit_to_Celsius/picture/fah_to_cel_picture.png)
 
 <!-- ## Getting Started
 
