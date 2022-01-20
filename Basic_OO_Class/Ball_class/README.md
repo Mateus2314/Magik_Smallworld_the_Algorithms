@@ -15,7 +15,9 @@
   The class has methods that create a clone of the class, which creates the object, change the color and show object color. </h4>
 </div>
 <div align="center">
+
   ![Bilby Stampede](https://static.lojadachape.com.br/produtos/bola-futebol-campo-umbro-veloce-supporter/68/D21-0459-068/D21-0459-068_zoom2.jpg?ts=1639673619&ims=544x)
+
 </div>
 ## How to use
 
