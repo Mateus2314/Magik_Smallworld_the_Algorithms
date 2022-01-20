@@ -33,26 +33,26 @@ Declare the class and methods in Emacs and create the object:
 
 Insert and create the class
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/create_class_picture.png)
 
 Init the class
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/Init_class_picture.png.png)
 
 Create method_change_class
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_change_class_picture.png)
 
 Create method_show_color
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_show_color_picture.png)
 
 Create the object
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_show_color_object_picture.png)
 
 Use method change_color
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/sum/picture/sum_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_change_object_picture.png)
 
 
 
