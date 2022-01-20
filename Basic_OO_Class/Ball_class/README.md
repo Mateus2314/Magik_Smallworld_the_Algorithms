@@ -16,8 +16,8 @@
 </div>
 <div align="center">
 
-  <img src="https://static.lojadachape.com.br/produtos/bola-futebol-campo-umbro-veloce-supporter/68/D21-0459-068/D21-0459-068_zoom2.jpg?ts=1639673619&ims=544x" height="400">
-  
+  <img src="https://static.lojadachape.com.br/produtos/bola-futebol-campo-umbro-veloce-supporter/68/D21-0459-068/D21-0459-068_zoom2.jpg?ts=1639673619&ims=544x" height="200">
+
 </div>
 ## How to use
 
