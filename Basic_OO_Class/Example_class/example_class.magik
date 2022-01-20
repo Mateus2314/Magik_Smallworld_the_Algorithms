@@ -7,14 +7,14 @@ def_slotted_exemplar(:cars_example ,
         # The name, manufacturer and manufacturing_date slots are initialized to _unset
        {:name, _unset, :readable},
        {:manufacturer, _unset, :readable},
-       {:manufacturing_date, _unset, :readble},
+       {:manufacturing_date, _unset, :readable},
        {:km_driven, _unset, :writable }
        # Only km_driven slot can be changed
     }               )
 
     # Method that clones class to generate the object
     _method cars_example.new(n,mf,md,kd)
-    _return _clone.init ( n, mf, md, kd)
+    _return _clone.init( n, mf, md, kd)
     _endmethod
     # Method that inserts the values into the object
     _private _method cars_example.init(n, mf, md, kd)

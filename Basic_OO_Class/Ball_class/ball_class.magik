@@ -1,0 +1,42 @@
+## Example of class declaration
+## Creating class balls
+_pragma(classify_level=basic, topic=ball_class)
+def_slotted_exemplar(:ball_class ,
+# Class slot declaration
+    {
+        # The name, manufacturer and manufacturing_date slots are initialized to _unset
+       {:color, _unset, :writable},
+       {:circumference, _unset, :readable},
+       {:material, _unset, :readable}
+       # Only color slot can be changed
+    }               )
+    # Method that clones class to generate the object
+    _method ball_class.new(col,cir,mt)
+    _return _clone.init( col, cir, mt)
+    _endmethod
+    # Method that inserts the values into the object
+    _private _method ball_class.init(col,cir,mt)
+        .color << col
+        .circumference << cir
+        .material << mt
+        _return _self
+    _endmethod
+
+    _method ball_class.change_color(col)
+        ## The method change the object color
+        .color << col
+        ## Return select color
+        _return _self
+    _endmethod
+
+    _method ball_class.show_color()
+        ## The Method show object object color 
+      show( .color )
+        _return 
+    _endmethod
+
+
+
+
+
+  
