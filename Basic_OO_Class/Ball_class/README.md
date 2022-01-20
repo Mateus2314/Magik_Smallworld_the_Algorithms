@@ -15,7 +15,7 @@
   The class has methods that create a clone of the class, which creates the object, change the color and show object color. </h4>
 </div>
 
-![Bilby Stampede](https://magazine25.vteximg.com.br/arquivos/ids/166261-550-550/Ima-Especial-Bola-de-Futebol---10-unidades.jpg?v=637366562815370000)
+![Bilby Stampede](https://static.lojadachape.com.br/produtos/bola-futebol-campo-umbro-veloce-supporter/68/D21-0459-068/D21-0459-068_zoom2.jpg?ts=1639673619&ims=544x)
 
 ## How to use
 
@@ -37,13 +37,14 @@ Insert and create the class
 
 Init the class
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/Init_class_picture.png.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/Init_class_picture.png)
 
 Create method_change_class
 
 ![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_change_class_picture.png)
 
 Create method_show_color
+
 ![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_OO_Class/Ball_class/picture/method_show_color_picture.png)
 
 Create the object
