@@ -24,7 +24,7 @@ Declare the method in Emacs and call it by .triangle_type() in a second command
 "The triangle is Isosceles"
  ```
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/square_area/picture/square_area_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_decision_structure/Exercise_with_method/triangle_type/picture/triangle_type_picture.png)
 
 <!-- ## Getting Started
 
