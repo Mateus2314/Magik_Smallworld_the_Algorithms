@@ -11,7 +11,8 @@
 <!-- Short description: -->
   <h3>Make a Method to identify the type of triangle by the size of the sides and show the result in Emacs</h3>
 
-  ![Bilby Stampede](https://calcworkshop.com/wp-content/uploads/triangle-classification-sides.png)
+<img src="https://calcworkshop.com/wp-content/uploads/triangle-classification-sides.png" height="300">
+
 </div>
 
 ## How to use
