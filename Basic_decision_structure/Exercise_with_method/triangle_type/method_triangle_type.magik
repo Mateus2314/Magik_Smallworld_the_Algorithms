@@ -1,0 +1,22 @@
+## Method to identify the type of triangle by the size of the sides
+## The float class receives integer float
+_method float.triangle_type( b2 , b3)
+    
+_if ( (_self = b2 ) _and ( b2 = b3 ) )
+    _then
+        # Condition where all sides are equal
+        write( "The triangle is Equilateral " )
+        _leave
+    _elif (( _self = b2 ) _or ( b2 = b3 ) _or ( _self = b3 ))
+    _then 
+        # Condition where two sides are equal
+        write("The triangle is Isosceles")
+        _leave
+    _elif( (_self <> b2 ) _and ( b2 <> b3 ) )
+    _then 
+        # Condition where all sides are different
+        write("The triangle is Scalene")
+        _leave  
+_endif
+_return   
+_endmethod
