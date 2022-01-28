@@ -9,20 +9,20 @@
   
   
 <!-- Short description: -->
-  <h3>Make a Method to convert meters to centimeters in Emacs</h3>
+  <h3>Make a Method to receive an array of numbers and find the smallest value in Emacs</h3>
 </div>
 
 ## How to use
 
-Declare the method in Emacs and call it by .meter_to_cent() in a second command
+Declare the method in Emacs and call it by .smallest_value() in a second command
 
 ```magik
  (user)MagikSF> a << {30, 40, 1, 4 , 5}
- (user)MagikSf> a.meter_to_cent()
-"Is 250.0000000 cm"
+ (user)MagikSf> a.smallest_value()
+  1
  ```
 
-![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_sequential_structure/Exercise_with_method/metro_to_centimeters/picture/meter_to_cent_picture.png)
+![Bilby Stampede](https://github.com/Mateus2314/Magik_Smallworld_the_Algorithms/blob/main/Basic_Loops/lower_value/picture/smallest_value_picture.png)
 
 <!-- ## Getting Started
 
