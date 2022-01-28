@@ -1,0 +1,20 @@
+## Method to receive an array of numbers and find the smallest value
+## The simple_vector class receives array with values
+_method simple_vector.smallest_value()
+## The am_element() method takes a random value from the received array
+smallest_value << _self.an_element()
+## The fast_elements() method outputs the elements directly from the array
+## All elements present in the array will be sent individually to the variable 'e'
+_for e _over _self.fast_elements()
+
+_loop
+    ## Condition checks at each occurrence of for if it is necessary to insert a value inside the variable smallest_value
+    _if e < smallest_value 
+        _then 
+            smallest_value << e 
+    _endif
+_endloop 
+    ## Show the smallest value in array
+    show( smallest_value )
+    _return 
+_endmethod
