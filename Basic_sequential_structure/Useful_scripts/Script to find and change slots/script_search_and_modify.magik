@@ -1,0 +1,48 @@
+## Stript to search and modify object slots
+
+_block
+
+    _local example_database << gis_program_manager.databases[:database_example]
+    _local a_table  << example_database.collections[:collection_example]
+
+    ## Declaring a variable where the ID of the modified slots will be written.
+    _local out << external_text_output_stream.new(system.getenv("TEMP") + "\ajuste_vao_at.log")
+
+    _protect 
+        ## Variables to visualize the table reading
+		_local size_total << a_table.size
+		_local tam << 0
+
+        out.write("ID MODIFY OBJECT", %newline)
+        _for a_rec _over a_table.fast_elements()
+        _loop
+		
+			tam +<< 1
+			logger.info(write_string("registro: ", tam, " de ",size_total ) )
+            
+            ## Rule for slot modification.
+            ## If the attribute is equal to 0, replace it with 1
+            ## numb_Of_Cables_Phase Slot Motification Example
+            _if a_rec.numb_Of_Cables_Phase _is _unset _orif
+                a_rec.numb_Of_Cables_Phase = "0"
+            _then
+
+                a_rec.numb_Of_Cables_Phase << "1"
+                ## Inserts the motivated object into the table
+                a_table.update(a_rec)
+                ## Commit the modify
+                example_database.commit()
+                ## Registers the id of the modified object.  
+               out.write(a_rec.id, %newline)
+
+            _endif
+
+         _endloop
+
+    _protection
+        out.flush()
+        out.close()
+    _endprotect
+
+_endblock
+ $
