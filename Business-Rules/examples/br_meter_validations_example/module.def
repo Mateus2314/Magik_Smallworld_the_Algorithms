@@ -1,0 +1,17 @@
+br_meter_validations_example	1
+
+description
+    Study Module - Business Rules for Poles
+
+    This module demonstrates best practices for implementing
+    Business Rules in Smallworld GIS
+
+    Author: Mateus De La Fuente Cezar
+    Year: 2025
+
+    Features:
+    - PRE/POST validation methods
+    - Helper methods for poles
+    - Installation/uninstallation scripts
+    - Automated tests
+end

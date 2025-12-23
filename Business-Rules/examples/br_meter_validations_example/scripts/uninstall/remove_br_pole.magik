@@ -1,0 +1,227 @@
+#% text_encoding = iso8859_1
+_package user
+
+$
+
+## ============================================================================
+## UNINSTALLATION SCRIPT - Business Rules for Poles
+##
+## Author: Mateus De La Fuente Cezar
+## Date: 2025
+## ============================================================================
+
+_global remove_pole_br_validation << _proc@remove_pole_br_validation()
+
+    write("")
+    write("=" * 80)
+    write("UNINSTALLATION: Business Rules for Poles (ed_pole)")
+    write("=" * 80)
+    write("")
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brt << csv.collection(:swo_business_rule)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    csv.switch(:write)
+
+    write("-> Configuration database accessed")
+    write("")
+
+    # ========================================
+    # METHOD 1: Remove by collection_name
+    # ========================================
+    write("-> Removing Business Rules by collection_name...")
+
+    _local pred << predicate.eq(:collection_name, "ed_pole")
+    _local usages << brut.select(pred)
+
+    _local total_removed << 0
+    _local brs_to_check << equality_set.new()  # Use set instead of rope
+
+    _for usage _over usages.fast_elements()
+    _loop
+        _local br << usage.business_rule
+
+        _if _not brs_to_check.includes?(br)
+        _then
+            write("  -> Removing: ", br.name, " (", br.run_method, ")")
+            brs_to_check.add(br)  # Add to set
+        _endif
+
+        # Remove usage
+        usage.delete()
+        total_removed +<< 1
+    _endloop
+
+    write("  Total usages removed: ", total_removed)
+    write("")
+
+    # ========================================
+    # METHOD 2: Remove orphan Business Rules (PROTECTED)
+    # ========================================
+    write("-> Removing orphan Business Rules...")
+
+    _local total_brs_removed << 0
+
+    _for br _over brs_to_check.fast_elements()
+    _loop
+        # PROTECTION: check if record still exists
+        _if br.is_valid()  # Check validity before accessing
+        _then
+            # Check if BR has other usages
+            _try _with cond
+                _local has_usages? << _not br.business_rule_usages.empty?
+
+                _if has_usages?
+                _then
+                    write("  * Keeping BR: ", br.name,
+                          " (still has ", br.business_rule_usages.size, " usage(s))")
+                _else
+                    write("  -> Removing BR: ", br.name)
+                    br.delete()
+                    total_brs_removed +<< 1
+                _endif
+
+            _when error, db_stale_handle  # PROTECTION: catch stale handle
+                write("  ! Warning: BR was already removed")
+            _endtry
+        _else
+            write("  ! Warning: Invalid BR (already removed)")
+        _endif
+    _endloop
+
+    write("  Total BRs removed: ", total_brs_removed)
+    write("")
+
+    # ========================================
+    # METHOD 3: Extra cleanup by run_method (safety)
+    # ========================================
+    write("-> Additional cleanup by run_method...")
+
+    _local methods << {
+        "br_pre_insert_validacao_basica()",
+        "br_pre_update_validacao_altura()",
+        "br_pre_delete_validar_exclusao()",
+        "br_post_insert_registrar_log()",
+        "br_post_update_registrar_alteracao()"
+    }
+
+    _local total_extras << 0
+
+    _for method _over methods.fast_elements()
+    _loop
+        _for r _over brt.select(predicate.eq(:run_method, method)).fast_elements()
+        _loop
+            _try _with cond  # PROTECTION: try/catch
+                # Remove all usages
+                _for r_usage _over r.business_rule_usages.fast_elements()
+                _loop
+                    r_usage.delete()
+                    total_extras +<< 1
+                _endloop
+
+                # Remove the BR
+                r.delete()
+                write("  -> Removed extra: ", method)
+
+            _when error, db_stale_handle  # PROTECTION: catch stale handle
+                write("  ! Warning: ", method, " was already removed")
+            _endtry
+        _endloop
+    _endloop
+
+    write("  Total extras removed: ", total_extras)
+    write("")
+
+    # ========================================
+    # COMMIT
+    # ========================================
+    write("-> Committing changes...")
+
+    _try _with cond
+        csv.commit()
+        write("  OK: COMMIT successful")
+    _when error
+        write("  ERROR during COMMIT: ", cond.report_contents_string)
+        write("  -> Executing ROLLBACK...")
+        csv.rollback()
+        write("  OK: ROLLBACK executed")
+    _endtry
+
+    csv.switch(:readonly)
+
+    write("")
+    write("=" * 80)
+    write("UNINSTALLATION SUMMARY")
+    write("=" * 80)
+    write("Usages removed: ", total_removed)
+    write("Business Rules removed: ", total_brs_removed)
+    write("Extras removed: ", total_extras)
+    write("Total: ", total_removed + total_brs_removed + total_extras)
+    write("=" * 80)
+    write("")
+    write("UNINSTALLATION COMPLETE!")
+    write("")
+
+_endproc
+$
+
+## ============================================================================
+## VERIFICATION PROCEDURE (before and after)
+## ============================================================================
+
+_global verify_pole_br << _proc@verify_pole_br()
+
+    write("")
+    write("=" * 80)
+    write("VERIFICATION: Business Rules for ed_pole")
+    write("=" * 80)
+    write("")
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    _local pred << predicate.eq(:collection_name, "ed_pole")
+    _local usages << brut.select(pred)
+
+    _if usages.empty?
+    _then
+        write("OK: No Business Rules found for ed_pole")
+        write("  (Uninstallation complete)")
+    _else
+        write("WARNING: Business Rules still exist:")
+        write("")
+
+        _for usage _over usages.fast_elements()
+        _loop
+            _local br << usage.business_rule
+            write("  * ", br.name)
+            write("    Method: ", br.run_method)
+            write("    Type: ", usage.rule_type)
+            write("")
+        _endloop
+    _endif
+
+    write("=" * 80)
+    write("")
+
+_endproc
+$
+
+## ============================================================================
+## EXECUTE UNINSTALLATION
+## ============================================================================
+
+# Check BEFORE
+write("BEFORE UNINSTALLATION:")
+verify_pole_br()
+$
+
+# Uninstall
+remove_pole_br_validation()
+$
+
+# Check AFTER
+write("AFTER UNINSTALLATION:")
+verify_pole_br()
+$

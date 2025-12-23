@@ -1,0 +1,351 @@
+#% text_encoding = iso8859_1
+_package user
+
+$
+
+## ============================================================================
+## BUSINESS RULES - Pole Validations (ed_pole)
+##
+## Author: Mateus De La Fuente Cezar
+## Date: 2025
+## Based on: AMENER-50
+##
+## Description:
+##   Complete set of Business Rules for validating pole operations:
+##   - PRE INSERT: Validates geometry, height, and distance
+##   - PRE UPDATE: Validates height and structural capacity
+##   - PRE DELETE: Validates equipment and asks for confirmation
+##   - POST INSERT: Records insertion log
+##   - POST UPDATE: Records update log
+##
+## Usage:
+##   1. Load this file: load_file("...br_pole_validations.magik")
+##   2. Load helpers: load_file("...br_pole_helpers.magik")
+##   3. Install BRs: load_file("...install/insert_br_pole.magik")
+##   4. Test: load_file("...tests/test_pole_rules.magik")
+## ============================================================================
+
+## ----------------------------------------------------------------------------
+## BUSINESS RULE 1: PRE INSERT - Basic Validation
+## ----------------------------------------------------------------------------
+## Description:
+##   Validates BEFORE inserting a new pole in the database.
+##   Ensures data quality and prevents insertion of invalid poles.
+##
+## Validations:
+##   1. Geometry must be defined (mandatory field)
+##   2. Height must be in valid range (6-20 meters)
+##   3. Minimum distance from other poles (5 meters)
+##
+## Returns:
+##   - Proceeds with insertion if all validations pass
+##   - condition.raise() if validation fails (blocks insertion)
+##
+## Configuration in cs_config:
+##   - dataset_name: "electric"
+##   - collection_name: "ed_pole"
+##   - rule_type: "Pre-Insert Action"
+##   - run_method: "br_pre_insert_validacao_basica()"
+##   - sequence_number: 100
+##   - mandatory_ind: _true
+##   - enabled_ind: _true
+## ----------------------------------------------------------------------------
+
+_method ed_pole.br_pre_insert_validacao_basica()
+    ## PRE INSERT Business Rule - Basic Validation
+    ##
+    ## Validates geometry, height, and minimum distance before insertion.
+    ## Blocks operation if any validation fails.
+
+    # ========================================
+    # VALIDATION 1: Geometry is mandatory
+    # ========================================
+    _if _self.location _is _unset
+    _then
+        condition.raise(:user_error,
+                :string, "ERROR: Pole geometry must be defined!",
+                :pole, _self)
+    _endif
+
+    # ========================================
+    # VALIDATION 2: Height range (6-20m)
+    # ========================================
+    _local altura << _self.altura_util_m
+
+    _if altura _is _unset
+    _then
+        condition.raise(:user_error,
+                :string, "ERROR: Pole height (altura_util_m) must be filled!",
+                :pole, _self)
+    _endif
+
+    _if altura < 6 _orif altura > 20
+    _then
+        condition.raise(:user_error,
+                :string, write_string("ERROR: Pole height must be between 6 and 20 meters. Informed: ", altura, "m"),
+                :pole, _self)
+    _endif
+
+    # ========================================
+    # VALIDATION 3: Minimum distance (5m)
+    # ========================================
+    _local nearby_poles << _self.buscar_postes_proximos(5)  # Helper method
+
+    _if _not nearby_poles.empty?
+    _then
+        _local dist << nearby_poles.an_element()[:distance]
+        condition.raise(:user_error,
+                :string, write_string("ERROR: There is another pole at ", dist.rounded, "m. Minimum: 5m"),
+                :pole, _self,
+                :nearby_poles, nearby_poles)
+    _endif
+
+    # All validations passed!
+    write("OK: Pole passed PRE INSERT validations")
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## BUSINESS RULE 2: PRE UPDATE - Height Validation
+## ----------------------------------------------------------------------------
+## Description:
+##   Validates BEFORE updating pole data.
+##   Ensures height changes are safe and respects structural capacity.
+##
+## Validations:
+##   1. Height must be in valid range (6-20 meters)
+##   2. If pole has equipment, validates structural capacity
+##
+## Returns:
+##   - Proceeds with update if all validations pass
+##   - condition.raise() if validation fails (blocks update)
+##
+## Configuration in cs_config:
+##   - rule_type: "Pre-Update Action"
+##   - run_method: "br_pre_update_validacao_altura()"
+##   - sequence_number: 110
+## ----------------------------------------------------------------------------
+
+_method ed_pole.br_pre_update_validacao_altura()
+    ## PRE UPDATE Business Rule - Height Validation
+    ##
+    ## Validates height and structural capacity before update.
+    ## Blocks operation if validation fails.
+
+    # ========================================
+    # VALIDATION 1: Height range (6-20m)
+    # ========================================
+    _local altura_nova << _self.altura_util_m
+
+    _if altura_nova _isnt _unset
+    _then
+        _if altura_nova < 6 _orif altura_nova > 20
+        _then
+            condition.raise(:user_error,
+                    :string, write_string("ERROR: Pole height must be between 6 and 20 meters. Informed: ", altura_nova, "m"),
+                    :pole, _self)
+        _endif
+    _endif
+
+    # ========================================
+    # VALIDATION 2: Structural capacity (simplified)
+    # ========================================
+    _local equipment << _self.buscar_equipamentos_conectados()  # Helper method
+
+    _if _not equipment.empty?
+    _then
+        # Calculate total load
+        _local total_load << _self.calcular_carga_total_poste()  # Helper method
+
+        # Simplified validation: if height < 8m and has equipment
+        _if altura_nova _isnt _unset _andif altura_nova < 8
+        _then
+            _if total_load > 3  # More than 3 equipment
+            _then
+                condition.raise(:user_error,
+                        :string, write_string("WARNING: Pole height ", altura_nova, "m may be insufficient for ", total_load, " equipment!"),
+                        :pole, _self,
+                        :total_load, total_load)
+            _endif
+        _endif
+    _endif
+
+    write("OK: Pole passed PRE UPDATE validations")
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## BUSINESS RULE 3: PRE DELETE - Deletion Validation
+## ----------------------------------------------------------------------------
+## Description:
+##   Validates BEFORE deleting a pole.
+##   Prevents deletion if pole has connected equipment.
+##
+## Validations:
+##   1. Cannot have connected equipment (transformers, switches, etc.)
+##   2. Cannot have connected conductors
+##   3. Asks for user confirmation
+##
+## Returns:
+##   - Proceeds with deletion if all validations pass
+##   - condition.raise() if validation fails (blocks deletion)
+##
+## Configuration in cs_config:
+##   - rule_type: "Pre-Delete Action"
+##   - run_method: "br_pre_delete_validar_exclusao()"
+##   - sequence_number: 120
+## ----------------------------------------------------------------------------
+
+_method ed_pole.br_pre_delete_validar_exclusao()
+    ## PRE DELETE Business Rule - Deletion Validation
+    ##
+    ## Validates equipment and asks for confirmation before deletion.
+    ## Blocks operation if validation fails.
+
+    # ========================================
+    # VALIDATION 1: Check connected equipment
+    # ========================================
+    _local equipment << _self.buscar_equipamentos_conectados()  # Helper method
+
+    _if _not equipment.empty?
+    _then
+        _local msg << write_string("ERROR: Cannot delete pole with ", equipment.size, " connected equipment!")
+
+        # Generate detailed report
+        _local report << _self.gerar_relatorio_validacao(equipment)  # Helper method
+
+        condition.raise(:user_error,
+                :string, msg + newline_char + report,
+                :pole, _self,
+                :equipment, equipment)
+    _endif
+
+    # ========================================
+    # VALIDATION 2: Check connected conductors
+    # ========================================
+    _local conductors << _self.follows(:ed_overhead_span)
+
+    _if _not conductors.empty?
+    _then
+        condition.raise(:user_error,
+                :string, write_string("ERROR: Cannot delete pole with ", conductors.size, " connected conductors!"),
+                :pole, _self,
+                :conductors, conductors)
+    _endif
+
+    # ========================================
+    # VALIDATION 3: User confirmation
+    # ========================================
+    # In production, you could add a confirmation dialog here
+    # Example:
+    # _local confirmed? << _self.show_confirmation_dialog()
+    # _if _not confirmed? _then condition.raise(...) _endif
+
+    write("OK: Pole passed PRE DELETE validations")
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## BUSINESS RULE 4: POST INSERT - Record Log
+## ----------------------------------------------------------------------------
+## Description:
+##   Executes AFTER successfully inserting a new pole.
+##   Records information about the operation.
+##
+## Logged Information:
+##   - Pole height
+##   - Geographic coordinates
+##   - Insertion timestamp
+##
+## Note:
+##   This method does NOT block the operation (POST action).
+##   It only records information for auditing.
+##
+## Configuration in cs_config:
+##   - rule_type: "Post-Insert Action"
+##   - run_method: "br_post_insert_registrar_log()"
+##   - sequence_number: 200
+## ----------------------------------------------------------------------------
+
+_method ed_pole.br_post_insert_registrar_log()
+    ## POST INSERT Business Rule - Record Log
+    ##
+    ## Records information about the inserted pole.
+    ## Does not block operation.
+
+    _local altura << _self.altura_util_m
+    _local coord << _self.location
+
+    write("")
+    write("=" * 60)
+    write("POST INSERT LOG - New Pole")
+    write("=" * 60)
+    write("Height: ", altura.default("Not informed"), " meters")
+    write("Location: ", coord.default("Not defined"))
+    write("Timestamp: ", date_time.now())
+    write("=" * 60)
+    write("")
+
+    # In production, you could:
+    # - Save to audit table
+    # - Send notification
+    # - Generate automatic report
+    # - Update statistics
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## BUSINESS RULE 5: POST UPDATE - Record Changes
+## ----------------------------------------------------------------------------
+## Description:
+##   Executes AFTER successfully updating a pole.
+##   Records what was changed.
+##
+## Logged Information:
+##   - Changed fields
+##   - Old and new values
+##   - Update timestamp
+##
+## Note:
+##   This method does NOT block the operation (POST action).
+##   It only records information for auditing.
+##
+## Configuration in cs_config:
+##   - rule_type: "Post-Update Action"
+##   - run_method: "br_post_update_registrar_alteracao()"
+##   - sequence_number: 210
+## ----------------------------------------------------------------------------
+
+_method ed_pole.br_post_update_registrar_alteracao()
+    ## POST UPDATE Business Rule - Record Changes
+    ##
+    ## Records information about the updated pole.
+    ## Does not block operation.
+
+    write("")
+    write("=" * 60)
+    write("POST UPDATE LOG - Pole Updated")
+    write("=" * 60)
+    write("Pole ID: ", _self.source_id.default("N/A"))
+    write("Height: ", _self.altura_util_m.default("Not informed"), " meters")
+    write("Timestamp: ", date_time.now())
+    write("User: ", gis_program_manager.login_name)
+    write("=" * 60)
+    write("")
+
+    # In production, you could:
+    # - Compare old vs new values (using cached data)
+    # - Save detailed log to audit table
+    # - Notify interested parties
+    # - Trigger other processes (e.g., recalculate loads)
+
+_endmethod
+$
+
+## ============================================================================
+## END OF FILE - br_pole_validations.magik
+## ============================================================================

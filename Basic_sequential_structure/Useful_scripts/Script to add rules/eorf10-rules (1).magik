@@ -1,0 +1,141 @@
+_global inserir_br_pre_insert_validate_qtd_cable_phasing << _proc@inserir_br_pre_insert_validate_qtd_cable_phasing()
+## --------------------------------------------------------------------------------------------------------------
+## fcn3 ( 11/01/2022 ) - Inclusão das regras de negócio calculo da catenaria
+## --------------------------------------------------------------------------------------------------------------
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brt << csv.collection(:swo_business_rule)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    csv.switch(:write)
+
+    _for r _over brt.select(predicate.eq(:run_method, "br_pre_insert_validate_qtd_cable_phasing()")).fast_elements()
+    _loop
+        _for r_usage _over r.business_rule_usages.fast_elements()
+        _loop
+            r_usage.delete()
+        _endloop
+        r.delete()
+    _endloop
+
+    #Insert Rule
+    _local a_dbr << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr[:run_method] << "br_pre_insert_validate_qtd_cable_phasing()"
+    a_dbr[:name] << "Quantidade de cabos por fase"
+    a_dbr[:description] << "Valor padrão para Quantidade de Cabos por Fase em Vão de AT"
+
+    #Insert Rule
+    _local a_br << record_transaction.new_insert(brt, a_dbr).run()
+
+    lista_colls_mandatory_fields << {   :eo_cable  }
+
+    # Actions e Sequence Number
+    pl << property_list.new_with( :|Pre-Insert Action|, 105)
+
+#   _for c, fn _over lista_colls_mandatory_fields.fast_keys_and_elements()
+#   _loop
+    _for c _over lista_colls_mandatory_fields.fast_elements()
+    _loop
+#       _for act_name _over {"Post-Update Action","Post-Insert Action"}.fast_elements()
+        _for act_name, seq_num _over pl.fast_keys_and_elements()
+        _loop
+            ##Insert Rule Usage
+            _local a_dubr_upd << brut.new_detached_record().prepare_fields_and_values()
+            a_dubr_upd[:dataset_name] << "electric"
+            a_dubr_upd[:collection_name] << c.write_string
+            a_dubr_upd[:rule_level] << "Object"
+#           a_dubr_upd[:field_name] << fn
+            a_dubr_upd[:sequence_number] << seq_num
+            a_dubr_upd[:mandatory_ind] << _true
+            a_dubr_upd[:enabled_ind] << _true
+            a_dubr_upd[:business_rule] << a_br
+            a_dubr_upd[:rule_type] << act_name
+            # Delete, Update, Insert, Validator, Pre-Delete Action, Pre-Update Action
+            # Pre-Insert Action, Post-Delete Action, Post-Update Action, Post-Insert Action
+
+            ##Insert Rule Usage
+            record_transaction.new_insert(brut, a_dubr_upd).run()
+        _endloop
+    _endloop
+
+    csv.commit()
+    csv.switch(:readonly)
+
+    write( "Fim da criação da regras de negócio!" )
+
+_endproc
+$
+
+_global inserir_br_update_validate_qtd_cable_phasing << _proc@inserir_br_update_validate_qtd_cable_phasing()
+## --------------------------------------------------------------------------------------------------------------
+## fcn3 ( 11/01/2022 ) - Inclusão das regras de negócio calculo da catenaria
+## --------------------------------------------------------------------------------------------------------------
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brt << csv.collection(:swo_business_rule)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    csv.switch(:write)
+
+    _for r _over brt.select(predicate.eq(:run_method, "br_update_validate_qtd_cable_phasing()")).fast_elements()
+    _loop
+        _for r_usage _over r.business_rule_usages.fast_elements()
+        _loop
+            r_usage.delete()
+        _endloop
+        r.delete()
+    _endloop
+
+    #Insert Rule
+    _local a_dbr << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr[:run_method] << "br_update_validate_qtd_cable_phasing()"
+    a_dbr[:name] << "Quantidade de cabos por fase"
+    a_dbr[:description] << "Valor padrão para Quantidade de Cabos por Fase em Vão de AT"
+
+    #Insert Rule
+    _local a_br << record_transaction.new_insert(brt, a_dbr).run()
+
+    lista_colls_mandatory_fields << {   :eo_cable  }
+
+    # Actions e Sequence Number
+    pl << property_list.new_with( :|Pre-Update Action|, 105)
+
+#   _for c, fn _over lista_colls_mandatory_fields.fast_keys_and_elements()
+#   _loop
+    _for c _over lista_colls_mandatory_fields.fast_elements()
+    _loop
+#       _for act_name _over {"Post-Update Action","Post-Insert Action"}.fast_elements()
+        _for act_name, seq_num _over pl.fast_keys_and_elements()
+        _loop
+            ##Insert Rule Usage
+            _local a_dubr_upd << brut.new_detached_record().prepare_fields_and_values()
+            a_dubr_upd[:dataset_name] << "electric"
+            a_dubr_upd[:collection_name] << c.write_string
+            a_dubr_upd[:rule_level] << "Object"
+#           a_dubr_upd[:field_name] << fn
+            a_dubr_upd[:sequence_number] << seq_num
+            a_dubr_upd[:mandatory_ind] << _true
+            a_dubr_upd[:enabled_ind] << _true
+            a_dubr_upd[:business_rule] << a_br
+            a_dubr_upd[:rule_type] << act_name
+            # Delete, Update, Insert, Validator, Pre-Delete Action, Pre-Update Action
+            # Pre-Insert Action, Post-Delete Action, Post-Update Action, Post-Insert Action
+
+            ##Insert Rule Usage
+            record_transaction.new_insert(brut, a_dubr_upd).run()
+        _endloop
+    _endloop
+
+    csv.commit()
+    csv.switch(:readonly)
+
+    write( "Fim da criação da regras de negócio!" )
+
+_endproc
+$
+
+inserir_br_pre_insert_validate_qtd_cable_phasing()
+$
+
+inserir_br_update_validate_qtd_cable_phasing()
+$

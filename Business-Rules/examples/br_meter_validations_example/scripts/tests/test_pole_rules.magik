@@ -1,0 +1,322 @@
+#% text_encoding = iso8859_1
+_package user
+
+$
+
+## ============================================================================
+## TEST SCRIPT - Business Rules for Poles
+##
+## Description: Tests the Business Rules validations for ed_pole
+## Author: Mateus De La Fuente Cezar
+## Date: 2025
+##
+## IMPORTANT: Load BEFORE:
+##   1. br_pole_validations.magik (methods)
+##   2. br_pole_helpers.magik (helpers)
+##   3. insert_br_pole.magik (business rules)
+## ============================================================================
+
+_global execute_pole_br_tests << _proc@execute_pole_br_tests()
+
+    write("")
+    write("=" * 80)
+    write("TESTS: Business Rules - Poles (ed_pole)")
+    write("=" * 80)
+    write("")
+
+    _local gis_view << gis_program_manager.cached_dataset(:electric)
+    _local pole_coll << gis_view.collections[:ed_pole]
+
+    _local total_tests << 0
+    _local tests_passed << 0
+    _local tests_failed << 0
+
+    # =============================================
+    # TEST 1: Check existing poles in database
+    # =============================================
+    total_tests +<< 1
+    write("TEST ", total_tests, ": Check existing poles in database")
+    write("-" * 80)
+
+    _local counter << 0
+    _for p _over pole_coll.fast_elements()
+    _loop
+        counter +<< 1
+        _if counter > 5 _then _leave _endif
+
+        write("  Pole ", counter, ":")
+        write("    ID: ", p.id)
+        write("    Height: ", p.height.default("N/A"), " meters")
+        _if p.location _isnt _unset
+        _then
+            write("    Coordinates: ", p.location.coord.write_string)
+        _endif
+        write("")
+    _endloop
+
+    _if counter = 0
+    _then
+        write("  No poles found in database")
+        write("  WARNING: Create at least one pole to test validations")
+        tests_failed +<< 1
+    _else
+        write("  Poles found in database (showing only 5)")
+        tests_passed +<< 1
+    _endif
+    write("")
+
+    # =============================================
+    # TEST 2: List installed Business Rules
+    # =============================================
+    total_tests +<< 1
+    write("TEST ", total_tests, ": Check installed Business Rules")
+    write("-" * 80)
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brt << csv.collection(:swo_business_rule)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    _local expected_methods << {
+        "br_pre_insert_validacao_basica()",
+        "br_pre_update_validacao_altura()",
+        "br_pre_delete_validar_exclusao()",
+        "br_post_insert_registrar_log()",
+        "br_post_update_registrar_alteracao()"
+    }
+
+    _local br_counter << 0
+
+    # Check each method using predicate.eq()
+    _for method _over expected_methods.fast_elements()
+    _loop
+        _for r _over brt.select(predicate.eq(:run_method, method)).fast_elements()
+        _loop
+            br_counter +<< 1
+            write("  BR ", br_counter, ": ", r.name)
+            write("    Method: ", r.run_method)
+
+            # Get usages for this rule
+            _for r_usage _over r.business_rule_usages.fast_elements()
+            _loop
+                write("    Type: ", r_usage.rule_type)
+                write("    Sequence: ", r_usage.sequence_number)
+                write("    Enabled: ", r_usage.enabled_ind)
+            _endloop
+            write("")
+        _endloop
+    _endloop
+
+    _if br_counter = 5
+    _then
+        write("  OK: All 5 Business Rules are installed!")
+        tests_passed +<< 1
+    _else
+        write("  ERROR: Expected 5 BRs, found ", br_counter)
+        write("  Execute: load_file(insert_br_pole.magik)")
+        tests_failed +<< 1
+    _endif
+    write("")
+
+    # =============================================
+    # TEST 3: Check rule configuration
+    # =============================================
+    total_tests +<< 1
+    write("TEST ", total_tests, ": Check rule configuration")
+    write("-" * 80)
+
+    _local config_ok << _true
+
+    # Check using predicate.eq() for each method
+    _for method _over expected_methods.fast_elements()
+    _loop
+        _local br_found << brt.select(predicate.eq(:run_method, method))
+
+        _if br_found.empty?
+        _then
+            write("  ERROR: Business Rule not found for: ", method)
+            config_ok << _false
+        _endif
+    _endloop
+
+    _if config_ok
+    _then
+        write("  OK: All rules are configured correctly!")
+        tests_passed +<< 1
+    _else
+        write("  ERROR: Problems in rule configuration")
+        tests_failed +<< 1
+    _endif
+    write("")
+
+    # =============================================
+    # TEST 4: Check collection and dataset
+    # =============================================
+    total_tests +<< 1
+    write("TEST ", total_tests, ": Check dataset and collection")
+    write("-" * 80)
+
+    _local dataset_ok << _true
+
+    _if gis_view _is _unset
+    _then
+        write("  ERROR: Dataset 'electric' not found")
+        dataset_ok << _false
+    _else
+        write("  OK: Dataset 'electric' found")
+    _endif
+
+    _if pole_coll _is _unset
+    _then
+        write("  ERROR: Collection 'ed_pole' not found")
+        dataset_ok << _false
+    _else
+        write("  OK: Collection 'ed_pole' found")
+        write("  INFO: Total poles: many (showing only 5 in tests)")
+    _endif
+
+    _if dataset_ok
+    _then
+        tests_passed +<< 1
+    _else
+        tests_failed +<< 1
+    _endif
+    write("")
+
+    # =============================================
+    # TEST 5: Installation summary
+    # =============================================
+    total_tests +<< 1
+    write("TEST ", total_tests, ": Installation summary")
+    write("-" * 80)
+
+    _local summary_ok << _true
+
+    write("  Installed Business Rules: ", br_counter, " / 5")
+    write("  Poles in database: ", counter > 0)
+    write("  Dataset configured: ", gis_view _isnt _unset)
+    write("  Collection configured: ", pole_coll _isnt _unset)
+
+    _if br_counter = 5 _andif counter > 0
+    _then
+        write("")
+        write("  OK: System ready for manual tests!")
+        tests_passed +<< 1
+    _else
+        write("")
+        write("  WARNING: System needs adjustments")
+        summary_ok << _false
+        tests_failed +<< 1
+    _endif
+    write("")
+
+    # =============================================
+    # Instructions for MANUAL testing
+    # =============================================
+    write("=" * 80)
+    write("MANUAL TESTING INSTRUCTIONS")
+    write("=" * 80)
+    write("")
+    write("IMPORTANT: Were the methods loaded? Check:")
+    write("")
+    write("  load_file(...br_pole_validations.magik)")
+    write("  load_file(...br_pole_helpers.magik)")
+    write("")
+    write("=" * 80)
+    write("")
+    write("To test validations in Smallworld GIS:")
+    write("")
+    write("1. TEST PRE INSERT - Without geometry:")
+    write("   - Enable edit mode")
+    write("   - Try to insert a pole WITHOUT geometry")
+    write("   - Expected result: ERROR 'Pole must have geometry'")
+    write("")
+    write("2. TEST PRE INSERT - Invalid height:")
+    write("   - Insert a pole with height = 3 meters")
+    write("   - Expected result: ERROR 'Height out of range'")
+    write("")
+    write("3. TEST PRE INSERT - Valid pole:")
+    write("   - Insert a pole with height = 9 meters")
+    write("   - Expected result: SUCCESS + log in console")
+    write("")
+    write("4. TEST PRE UPDATE - Height too high:")
+    write("   - Select an existing pole")
+    write("   - Change height to 25 meters")
+    write("   - Expected result: ERROR 'Height out of range'")
+    write("")
+    write("5. TEST PRE UPDATE - Valid height:")
+    write("   - Change height to 12 meters")
+    write("   - Expected result: SUCCESS + log in console")
+    write("")
+    write("6. TEST POST INSERT/UPDATE:")
+    write("   - Insert or update a pole")
+    write("   - Check the console")
+    write("   - Expected result: Detailed log messages")
+    write("")
+    write("7. TEST PRE DELETE - With equipment:")
+    write("   - Select a pole with equipment")
+    write("   - Try to delete")
+    write("   - Expected result: ERROR 'Remove equipment first'")
+    write("")
+    write("8. TEST PRE DELETE - Without equipment:")
+    write("   - Select a pole WITHOUT equipment")
+    write("   - Try to delete")
+    write("   - Expected result: Confirmation dialog")
+    write("")
+
+    # =============================================
+    # Final Summary
+    # =============================================
+    write("=" * 80)
+    write("AUTOMATED TEST SUMMARY")
+    write("=" * 80)
+    write("Total tests: ", total_tests)
+    write("Tests passed: ", tests_passed)
+    write("Tests failed: ", tests_failed)
+
+    _if total_tests > 0
+    _then
+        _local percentage << ((tests_passed.as_float / total_tests) * 100).rounded
+        write("Success rate: ", percentage, "%")
+    _endif
+
+    write("")
+
+    _if tests_failed = 0
+    _then
+        write("STATUS: ALL AUTOMATED TESTS PASSED!")
+        write("")
+        write("Next steps:")
+        write("  1. Make sure methods were loaded")
+        write("  2. Execute MANUAL tests described above")
+        write("  3. Insert/update/delete poles in GIS")
+        write("  4. Check if validations are working")
+        write("  5. Check logs in console")
+    _else
+        write("STATUS: SOME TESTS FAILED")
+        write("")
+        write("Required corrections:")
+        _if counter = 0
+        _then
+            write("  - No poles in database (create at least one)")
+        _endif
+        _if br_counter < 5
+        _then
+            write("  - Execute: load_file(...insert_br_pole.magik)")
+        _endif
+        write("  - Make sure methods were loaded:")
+        write("    load_file(...br_pole_validations.magik)")
+        write("    load_file(...br_pole_helpers.magik)")
+    _endif
+
+    write("=" * 80)
+    write("")
+
+_endproc
+$
+
+## ============================================================================
+## EXECUTE TESTS
+## ============================================================================
+
+execute_pole_br_tests()
+$

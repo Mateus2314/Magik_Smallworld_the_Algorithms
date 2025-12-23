@@ -1,0 +1,266 @@
+#% text_encoding = iso8859_1
+_package user
+
+$
+
+## ============================================================================
+## INSTALLATION SCRIPT - Business Rules for Poles
+##
+## Description:
+##   Installs all example Business Rules for pole validation
+##
+## Author: Mateus De La Fuente Cezar
+## Date: 2025
+##
+## Prerequisites:
+##   1. Load br_pole_validations.magik (validation methods)
+##   2. Load br_pole_helpers.magik (helper methods)
+##
+## Usage:
+##   load_file("...insert_br_pole.magik")
+## ============================================================================
+
+_global insert_br_pole_validation << _proc@insert_br_pole_validation()
+
+    write("")
+    write("=" * 80)
+    write("INSTALLATION: Business Rules for Poles (ed_pole)")
+    write("=" * 80)
+    write("")
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brt << csv.collection(:swo_business_rule)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    csv.switch(:write)
+
+    write("-> Configuration database accessed")
+    write("")
+
+    # ========================================
+    # Remove existing rules
+    # ========================================
+    write("-> Removing existing rules (if any)...")
+
+    _local methods << {
+        "br_pre_insert_validacao_basica()",
+        "br_pre_update_validacao_altura()",
+        "br_pre_delete_validar_exclusao()",
+        "br_post_insert_registrar_log()",
+        "br_post_update_registrar_alteracao()"
+    }
+
+    _local total_removed << 0
+    _for method _over methods.fast_elements()
+    _loop
+        _for r _over brt.select(predicate.eq(:run_method, method)).fast_elements()
+        _loop
+            _for r_usage _over r.business_rule_usages.fast_elements()
+            _loop
+                r_usage.delete()
+            _endloop
+            r.delete()
+            total_removed +<< 1
+            write("  Removed: ", method)
+        _endloop
+    _endloop
+
+    write("  Total removed: ", total_removed)
+    write("")
+
+    # ========================================
+    # RULE 1: PRE INSERT
+    # ========================================
+    write("-> Creating PRE INSERT rule...")
+
+    _local a_dbr << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr[:run_method] << "br_pre_insert_validacao_basica()"
+    a_dbr[:name] << "PRE INSERT Pole Validation"
+    a_dbr[:description] << "Validates geometry, height and distance before inserting pole"
+    _local a_br << record_transaction.new_insert(brt, a_dbr).run()
+
+    _local a_dubr << brut.new_detached_record().prepare_fields_and_values()
+    a_dubr[:dataset_name] << "electric"
+    a_dubr[:collection_name] << "ed_pole"
+    a_dubr[:rule_level] << "Object"
+    a_dubr[:sequence_number] << 100
+    a_dubr[:mandatory_ind] << _true
+    a_dubr[:enabled_ind] << _true
+    a_dubr[:business_rule] << a_br
+    a_dubr[:rule_type] << "Pre-Insert Action"
+    record_transaction.new_insert(brut, a_dubr).run()
+    write("  OK: PRE INSERT Pole Validation")
+
+    # ========================================
+    # RULE 2: PRE UPDATE
+    # ========================================
+    write("-> Creating PRE UPDATE rule...")
+
+    _local a_dbr2 << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr2[:run_method] << "br_pre_update_validacao_altura()"
+    a_dbr2[:name] << "PRE UPDATE Height Validation"
+    a_dbr2[:description] << "Validates height and structural capacity before updating"
+    _local a_br2 << record_transaction.new_insert(brt, a_dbr2).run()
+
+    _local a_dubr2 << brut.new_detached_record().prepare_fields_and_values()
+    a_dubr2[:dataset_name] << "electric"
+    a_dubr2[:collection_name] << "ed_pole"
+    a_dubr2[:rule_level] << "Object"
+    a_dubr2[:sequence_number] << 110
+    a_dubr2[:mandatory_ind] << _true
+    a_dubr2[:enabled_ind] << _true
+    a_dubr2[:business_rule] << a_br2
+    a_dubr2[:rule_type] << "Pre-Update Action"
+    record_transaction.new_insert(brut, a_dubr2).run()
+    write("  OK: PRE UPDATE Height Validation")
+
+    # ========================================
+    # RULE 3: PRE DELETE
+    # ========================================
+    write("-> Creating PRE DELETE rule...")
+
+    _local a_dbr3 << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr3[:run_method] << "br_pre_delete_validar_exclusao()"
+    a_dbr3[:name] << "PRE DELETE Pole Validation"
+    a_dbr3[:description] << "Validates if pole can be deleted and asks for confirmation"
+    _local a_br3 << record_transaction.new_insert(brt, a_dbr3).run()
+
+    _local a_dubr3 << brut.new_detached_record().prepare_fields_and_values()
+    a_dubr3[:dataset_name] << "electric"
+    a_dubr3[:collection_name] << "ed_pole"
+    a_dubr3[:rule_level] << "Object"
+    a_dubr3[:sequence_number] << 120
+    a_dubr3[:mandatory_ind] << _true
+    a_dubr3[:enabled_ind] << _true
+    a_dubr3[:business_rule] << a_br3
+    a_dubr3[:rule_type] << "Pre-Delete Action"
+    record_transaction.new_insert(brut, a_dubr3).run()
+    write("  OK: PRE DELETE Pole Validation")
+
+    # ========================================
+    # RULE 4: POST INSERT
+    # ========================================
+    write("-> Creating POST INSERT rule...")
+
+    _local a_dbr4 << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr4[:run_method] << "br_post_insert_registrar_log()"
+    a_dbr4[:name] << "POST INSERT Pole Log"
+    a_dbr4[:description] << "Records log after inserting new pole"
+    _local a_br4 << record_transaction.new_insert(brt, a_dbr4).run()
+
+    _local a_dubr4 << brut.new_detached_record().prepare_fields_and_values()
+    a_dubr4[:dataset_name] << "electric"
+    a_dubr4[:collection_name] << "ed_pole"
+    a_dubr4[:rule_level] << "Object"
+    a_dubr4[:sequence_number] << 200
+    a_dubr4[:mandatory_ind] << _true
+    a_dubr4[:enabled_ind] << _true
+    a_dubr4[:business_rule] << a_br4
+    a_dubr4[:rule_type] << "Post-Insert Action"
+    record_transaction.new_insert(brut, a_dubr4).run()
+    write("  OK: POST INSERT Pole Log")
+
+    # ========================================
+    # RULE 5: POST UPDATE
+    # ========================================
+    write("-> Creating POST UPDATE rule...")
+
+    _local a_dbr5 << brt.new_detached_record().prepare_fields_and_values()
+    a_dbr5[:run_method] << "br_post_update_registrar_alteracao()"
+    a_dbr5[:name] << "POST UPDATE Pole Log"
+    a_dbr5[:description] << "Records changes after updating pole"
+    _local a_br5 << record_transaction.new_insert(brt, a_dbr5).run()
+
+    _local a_dubr5 << brut.new_detached_record().prepare_fields_and_values()
+    a_dubr5[:dataset_name] << "electric"
+    a_dubr5[:collection_name] << "ed_pole"
+    a_dubr5[:rule_level] << "Object"
+    a_dubr5[:sequence_number] << 210
+    a_dubr5[:mandatory_ind] << _true
+    a_dubr5[:enabled_ind] << _true
+    a_dubr5[:business_rule] << a_br5
+    a_dubr5[:rule_type] << "Post-Update Action"
+    record_transaction.new_insert(brut, a_dubr5).run()
+    write("  OK: POST UPDATE Pole Log")
+
+    # ========================================
+    # Commit
+    # ========================================
+    write("")
+    write("-> Committing changes...")
+
+    csv.commit()
+    csv.switch(:readonly)
+
+    write("  OK: COMMIT successful!")
+    write("")
+    write("=" * 80)
+    write("INSTALLATION COMPLETE!")
+    write("=" * 80)
+    write("")
+    write("Total: 5 rules created")
+    write("")
+    write("End of Business Rules creation!")
+
+_endproc
+$
+
+## ============================================================================
+## VERIFICATION PROCEDURE (SIMPLIFIED - NO SORTING)
+## ============================================================================
+
+_global verify_br_installed << _proc@verify_br_installed()
+
+    write("")
+    write("=" * 80)
+    write("INSTALLED BUSINESS RULES - ed_pole")
+    write("=" * 80)
+    write("")
+
+    _local csv << gis_program_manager.cached_dataset(:cs_config)
+    _local brut << csv.collection(:swo_business_rule_usage)
+
+    _local pred << predicate.eq(:collection_name, "ed_pole")
+    _local usages << brut.select(pred)
+
+    _if usages.empty?
+    _then
+        write("No Business Rules found for ed_pole")
+    _else
+        _local counter << 0
+
+        # Iterate without sorting (like reference implementation)
+        _for usage _over usages.fast_elements()
+        _loop
+            counter +<< 1
+            _local br << usage.business_rule
+
+            write("Rule ", counter, ":")
+            write("  Name: ", br.name)
+            write("  Method: ", br.run_method)
+            write("  Type: ", usage.rule_type)
+            write("  Sequence: ", usage.sequence_number)
+            write("  Mandatory: ", usage.mandatory_ind)
+            write("  Enabled: ", usage.enabled_ind)
+            write("  Description: ", br.description)
+            write("")
+        _endloop
+
+        write("Total: ", counter, " Business Rule(s)")
+    _endif
+
+    write("=" * 80)
+    write("")
+
+_endproc
+$
+
+## ============================================================================
+## EXECUTE INSTALLATION
+## ============================================================================
+
+insert_br_pole_validation()
+$
+
+verify_br_installed()
+$

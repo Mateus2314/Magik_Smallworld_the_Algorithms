@@ -1,0 +1,349 @@
+#% text_encoding = iso8859_1
+_package user
+
+$
+
+## ============================================================================
+## HELPER METHODS for Pole Business Rules
+##
+## Author: Mateus De La Fuente Cezar
+## Date: 2025
+##
+## Description:
+##   Auxiliary methods used by Business Rules for poles (ed_pole).
+##   These methods encapsulate common logic and improve code maintainability.
+##
+## Methods:
+##   1. buscar_equipamentos_conectados() - Search for connected equipment
+##   2. calcular_carga_total_poste() - Calculate total load installed
+##   3. gerar_relatorio_validacao() - Generate validation report
+##   4. buscar_postes_proximos() - Search for nearby poles
+##   5. validar_capacidade_estrutural_simplificada() - Validate capacity
+##
+## Usage:
+##   Load this file before installing Business Rules:
+##   load_file("...br_pole_helpers.magik")
+## ============================================================================
+
+## ----------------------------------------------------------------------------
+## METHOD 1: Search Connected Equipment
+## ----------------------------------------------------------------------------
+## Description:
+##   Searches for all equipment installed/connected to the pole.
+##   Includes transformers, switches, regulators, etc.
+##
+## Returns:
+##   rope - Collection of connected equipment
+##
+## Example:
+##   _local equipment << my_pole.buscar_equipamentos_conectados()
+##   write("Total equipment: ", equipment.size)
+## ----------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={business_rule})
+_method ed_pole.buscar_equipamentos_conectados()
+    ## Search for all equipment installed/connected to the pole
+    ##
+    ## Returns:
+    ##   rope with all equipment
+
+    _local equipment << rope.new()
+
+    # Search for transformers
+    _local xfrmrs << _self.follows(:structure, :eo_power_xfrmr_inst)
+    _for xfrmr _over xfrmrs.fast_elements()
+    _loop
+        equipment.add_last(xfrmr)
+    _endloop
+
+    # Search for switches
+    _local switches << _self.follows(:structure, :eo_isolating_eqpt_inst)
+    _for sw _over switches.fast_elements()
+    _loop
+        equipment.add_last(sw)
+    _endloop
+
+    # Search for reclosers/regulators
+    _local regulators << _self.follows(:structure, :eo_regulating_eqpt_inst)
+    _for reg _over regulators.fast_elements()
+    _loop
+        equipment.add_last(reg)
+    _endloop
+
+    # Add other equipment types as needed
+
+    _return equipment
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## METHOD 2: Calculate Total Load
+## ----------------------------------------------------------------------------
+## Description:
+##   Calculates the total load installed on the pole.
+##   Sums the capacity of all transformers.
+##
+## Returns:
+##   float - Total load in kVA
+##
+## Example:
+##   _local load << my_pole.calcular_carga_total_poste()
+##   write("Total load: ", load, " kVA")
+## ----------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={business_rule})
+_method ed_pole.calcular_carga_total_poste()
+    ## Calculate the total load installed on the pole
+    ## Sums the capacity of all transformers
+    ##
+    ## Returns:
+    ##   float - Total load in kVA
+
+    _local total_load << 0.0
+
+    # Search for transformers on the pole
+    _local xfrmrs << _self.follows(:structure, :eo_power_xfrmr_inst)
+
+    _for xfrmr _over xfrmrs.fast_elements()
+    _loop
+        _local capacity << xfrmr.rated_capacity
+
+        _if capacity _isnt _unset
+        _then
+            total_load +<< capacity
+            write("  * Transformer: ", xfrmr.source_id.default("N/A"),
+                  " - ", capacity, " kVA")
+        _endif
+    _endloop
+
+    _return total_load
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## METHOD 3: Generate Validation Report
+## ----------------------------------------------------------------------------
+## Description:
+##   Generates a complete report with pole information.
+##   Useful for debugging during validations.
+##
+## Returns:
+##   unset - Prints report to console
+##
+## Example:
+##   my_pole.gerar_relatorio_validacao()
+## ----------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={business_rule})
+_method ed_pole.gerar_relatorio_validacao(equipment)
+    ## Generate a complete report with pole information
+    ## Useful for debugging during validations
+    ##
+    ## Parameters:
+    ##   equipment: rope - Optional list of equipment to report
+    ##
+    ## Returns:
+    ##   string - Formatted report
+
+    _local report << rope.new()
+
+    report.add_last("=" * 70)
+    report.add_last("POLE VALIDATION REPORT")
+    report.add_last("=" * 70)
+
+    # Basic information
+    report.add_last(write_string("Height: ", _self.altura_util_m.default("(not defined)"), " meters"))
+    report.add_last(write_string("Type: ", _self.pole_type.default("(not defined)")))
+    report.add_last(write_string("Has geometry?: ", _self.location _isnt _unset))
+
+    # Coordinates
+    _if _self.location _isnt _unset
+    _then
+        _local coord << _self.location.coord
+        report.add_last(write_string("Coordinates: X=", coord.x.rounded, " Y=", coord.y.rounded))
+    _endif
+
+    # Connected equipment
+    _if equipment _is _unset
+    _then
+        equipment << _self.buscar_equipamentos_conectados()
+    _endif
+
+    report.add_last("")
+    report.add_last(write_string("Connected equipment: ", equipment.size))
+    _for eqpt _over equipment.fast_elements()
+    _loop
+        report.add_last(write_string("  * ", eqpt.class_name))
+    _endloop
+
+    # Total load
+    _local load << _self.calcular_carga_total_poste()
+    report.add_last("")
+    report.add_last(write_string("Total installed load: ", load, " kVA"))
+
+    # Nearby poles
+    report.add_last("")
+    report.add_last("Nearby poles (50m):")
+    _local nearby_poles << _self.buscar_postes_proximos(50.0)
+    _if nearby_poles.empty?
+    _then
+        report.add_last("  (none)")
+    _else
+        _for other _over nearby_poles.fast_elements()
+        _loop
+            _local dist << _self.location.distance_to(other.location)
+            report.add_last(write_string("  * Distance: ", dist.rounded, " meters"))
+        _endloop
+    _endif
+
+    report.add_last("=" * 70)
+
+    # Return report as string
+    _return report.join_as_strings(newline_char)
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## METHOD 4: Search Nearby Poles
+## ----------------------------------------------------------------------------
+## Description:
+##   Searches for poles within a specified distance.
+##   Uses spatial query for efficiency.
+##
+## Parameters:
+##   max_distance: float - Maximum distance in meters
+##
+## Returns:
+##   rope - Collection of nearby ed_pole objects with distance info
+##
+## Example:
+##   _local nearby << my_pole.buscar_postes_proximos(10.0)
+##   write("Found ", nearby.size, " poles within 10m")
+## ----------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={business_rule})
+_method ed_pole.buscar_postes_proximos(max_distance)
+    ## Search for nearby poles within a distance
+    ##
+    ## Parameters:
+    ##   max_distance: float - distance in meters
+    ##
+    ## Returns:
+    ##   rope of property_list with :pole and :distance
+
+    _local results << rope.new()
+
+    _if _self.location _is _unset
+    _then
+        _return results
+    _endif
+
+    _local search_area << _self.location.bounds.buffered_by(max_distance)
+    _local poles << _self.source_view.world.geometry_at_bounds(
+        search_area,
+        ed_pole.collection_name)
+
+    _for other_pole _over poles.fast_elements()
+    _loop
+        _if other_pole = _self _then _continue _endif
+
+        _local dist << _self.location.distance_to(other_pole.location)
+        _if dist <= max_distance
+        _then
+            results.add_last(property_list.new_with(
+                :pole, other_pole,
+                :distance, dist))
+        _endif
+    _endloop
+
+    _return results
+
+_endmethod
+$
+
+## ----------------------------------------------------------------------------
+## METHOD 5: Validate Structural Capacity (Simplified)
+## ----------------------------------------------------------------------------
+## Description:
+##   Validates installed load vs pole height (simplified validation).
+##   Taller poles can support more load.
+##
+## Simple Rule:
+##   Height 6-9m:   up to 150 kVA
+##   Height 10-12m: up to 300 kVA
+##   Height 13-15m: up to 500 kVA
+##   Height > 15m:  up to 750 kVA
+##
+## Returns:
+##   unset - Prints validation result to console
+##
+## Note:
+##   This is a SIMPLIFIED validation for demonstration purposes.
+##   In production, use proper structural engineering calculations.
+##
+## Example:
+##   my_pole.validar_capacidade_estrutural_simplificada()
+## ----------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={business_rule})
+_method ed_pole.validar_capacidade_estrutural_simplificada()
+    ## Validate installed load vs pole height (simplified validation)
+    ## Taller poles can support more load
+    ##
+    ## Simple Rule:
+    ##   Height 6-9m:   up to 150 kVA
+    ##   Height 10-12m: up to 300 kVA
+    ##   Height 13-15m: up to 500 kVA
+    ##   Height > 15m:  up to 750 kVA
+
+    _local height << _self.altura_util_m
+
+    _if height _is _unset
+    _then
+        write("WARNING: Height not defined, skipping capacity validation")
+        _return
+    _endif
+
+    # Determine maximum capacity based on height
+    _local max_capacity
+
+    _if height < 10.0
+    _then
+        max_capacity << 150.0
+    _elif height < 13.0
+    _then
+        max_capacity << 300.0
+    _elif height < 16.0
+    _then
+        max_capacity << 500.0
+    _else
+        max_capacity << 750.0
+    _endif
+
+    _local installed_load << _self.calcular_carga_total_poste()
+
+    write("Structural capacity (simplified):")
+    write("  Height: ", height, " meters")
+    write("  Estimated max capacity: ", max_capacity, " kVA")
+    write("  Installed load: ", installed_load, " kVA")
+
+    _if installed_load > 0
+    _then
+        _local utilization << (installed_load / max_capacity * 100).rounded
+        write("  Utilization: ", utilization, "%")
+
+        _if installed_load > max_capacity
+        _then
+            write("  WARNING: Installed load exceeds estimated capacity!")
+        _endif
+    _endif
+
+_endmethod
+$
+
+## ============================================================================
+## END OF FILE - br_pole_helpers.magik
+## ============================================================================
